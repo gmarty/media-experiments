@@ -1,0 +1,223 @@
+<!doctype html>
+<html>
+<head>
+<title>Video element Shadow DOM</title>
+<style>
+.video {
+  object-fit: contain;
+}
+
+.webkit-media-controls {
+  width: inherit;
+  height: inherit;
+  position: relative;
+  direction: ltr;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.webkit-media-controls-enclosure {
+  width: 100%;
+  max-width: 800px;
+  height: 30px;
+  flex-shrink: 0;
+  bottom: 0px;
+  text-indent: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+.webkit-media-controls-enclosure {
+  padding: 0px 5px 5px;
+  height: 35px;
+  flex-shrink: 0;
+}
+
+.webkit-media-controls-panel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  -webkit-user-select: none;
+  position: relative;
+  width: 100%;
+  z-index: 0;
+  overflow: hidden;
+  text-align: right;
+  bottom: auto;
+  height: 30px;
+  background-color: rgba(20, 20, 20, 0.8);
+  border-radius: 5px;
+}
+
+.webkit-media-controls-play-button {
+  -webkit-appearance: media-play-button;
+  display: flex;
+  flex: 0 0 auto;
+  border: none;
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  box-sizing: border-box;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  margin-left: 9px;
+  margin-right: 9px;
+  padding: 0px;
+  background-color: initial;
+  color: inherit;
+}
+
+.webkit-media-controls-timeline {
+  -webkit-appearance: media-slider;
+  display: flex;
+  flex: 1 1 auto;
+  height: 8px;
+  margin: 0px 15px 0px 0px;
+  padding: 0px;
+  background-color: rgba(0, 0, 0, 0);
+  min-width: 25px;
+  border: initial;
+  color: inherit;
+}
+
+.webkit-media-controls-current-time-display, .webkit-media-controls-time-remaining-display {
+  -webkit-appearance: media-current-time-display;
+  -webkit-user-select: none;
+  flex: 0 0 auto;
+  display: flex;
+  border: none;
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  cursor: default;
+  height: 30px;
+  margin: 0px 9px 0px 0px;
+  padding: 0px;
+  line-height: 30px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  font-style: normal;
+  color: #FFF;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-transform: none;
+  text-indent: 0px;
+  text-shadow: none;
+  text-decoration: none;
+}
+
+.webkit-media-controls-mute-button {
+  -webkit-appearance: media-mute-button;
+  display: flex;
+  flex: 0 0 auto;
+  border: none;
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  box-sizing: border-box;
+  width: 35px;
+  height: 30px;
+  line-height: 30px;
+  margin: 0px 6px 0px 0px;
+  padding: 0px;
+  background-color: initial;
+  color: inherit;
+}
+
+.webkit-media-controls-volume-slider {
+  -webkit-appearance: media-volume-slider;
+  display: flex;
+  flex: 1 1.899999976158142 auto;
+  height: 8px;
+  max-width: 70px;
+  margin: 0px 15px 0px 0px;
+  padding: 0px;
+  background-color: rgba(0, 0, 0, 0);
+  min-width: 15px;
+  border: initial;
+  color: inherit;
+}
+
+.webkit-media-controls-toggle-closed-captions-button {
+  -webkit-appearance: media-toggle-closed-captions-button;
+  display: flex;
+  flex: 0 0 auto;
+  border: none;
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  box-sizing: border-box;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  margin-left: -5px;
+  margin-right: 9px;
+  padding: 0px;
+  background-color: initial;
+  color: inherit;
+}
+
+.webkit-media-controls-fullscreen-button {
+  -webkit-appearance: media-enter-fullscreen-button;
+  display: flex;
+  flex: 0 0 auto;
+  border: none;
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  box-sizing: border-box;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  margin-left: -5px;
+  margin-right: 9px;
+  padding: 0px;
+  background-color: initial;
+  color: inherit;
+}
+</style>
+</head>
+<body>
+<h1>Video element Shadow DOM</h1>
+
+<p>In Chrome, the video player is built using Shadow DOM.</p>
+
+<p>I've extracted the markup and style below as of Chrome 33. The `-webkit-appearance` CSS element is not supported, that's why it's different than a real video element.</p>
+
+<p>This can be used to understand the structure of the player and alter its appearance.</p>
+
+<div class="video" style="width:480px; height:320px;">
+  <div class="webkit-media-controls">
+    <div class="webkit-media-controls-enclosure">
+      <div class="webkit-media-controls-panel" style="transition: opacity 0.3s; -webkit-transition: opacity 0.3s; opacity: 1;">
+        <input type="button" class="webkit-media-controls-play-button">
+        <input type="range" step="any" max="32.32" class="webkit-media-controls-timeline">
+
+        <div class="webkit-media-controls-current-time-display">0:30</div>
+        <div class="webkit-media-controls-time-remaining-display" style="display: none;">0:32</div>
+        <input type="button" class="webkit-media-controls-mute-button">
+        <input type="range" step="any" max="1" class="webkit-media-controls-volume-slider">
+        <input type="button" style="display: none;" class="webkit-media-controls-toggle-closed-captions-button">
+        <input type="button" class="webkit-media-controls-fullscreen-button">
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

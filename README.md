@@ -27,6 +27,10 @@ Prefetch a video and know exactly how much is loaded using XHR.
 
 An example of the Media Fragment URI you can use to see the HTTP headers involved.
 
+### video-shadow-dom.html
+
+Markup and style extracted from Chrome video player Shadow DOM to help applying styling.
+
 ### video-events.html
 
-Log the list of all events fired in order by media elements.
+Log the list of events fired in order by media elements.
