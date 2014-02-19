@@ -19,6 +19,10 @@ In Firefox, you need to activate the Media Source Extensions API. Go to `about:c
 
 Then, point your browser to `http://localhost:3000/play-video-segment.html`.
 
+### media-fragments-uri.html
+
+An example of the Media Fragment URI you can use to see the HTTP headers involved.
+
 ### video-events.html
 
 Log the list of all events fired in order by media elements.

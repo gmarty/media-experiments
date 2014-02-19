@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+<title>Media Fragments URI</title>
+</head>
+<body>
+<h1>Media Fragments URI</h1>
+
+<p>A temporal dimension for the video is specified.</p>
+
+<p>Open the Network tab of your browser dev tool and see the HTTP headers `Range` in the request and `Content-Range` in the response.</p>
+
+<p>Also, please note that each video segment has a status code of `206 Partial Content`.</p>
+<video src="media/big-buck-bunny.webm#t=22,23" controls></video>
+<p>Depending on the video file and the browser, there is either:</p>
+<ul>
+  <li>A single request loading the complete video.</li>
+  <li>A first request, aborted, to get the header, then one or more requests to get the section needed.</li>
+</ul>
+</body>
+</html>
