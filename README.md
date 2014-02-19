@@ -18,3 +18,7 @@ In Firefox, you need to activate the Media Source Extensions API. Go to `about:c
 `media.mediasource.enabled` to true.
 
 Then, point your browser to `http://localhost:3000/play-video-segment.html`.
+
+### video-events.html
+
+Log the list of all events fired in order by media elements.

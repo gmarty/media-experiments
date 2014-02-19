@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+<title>Video events</title>
+<body>
+<h1>Video events</h1>
+
+<p>Open your browser console and look for the logged events.</p>
+<video src="media/big-buck-bunny.webm" autoplay controls></video>
+<script>
+var video = document.querySelector('video');
+var now = performance.now();
+// From https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events
+[
+  'abort',
+  'canplay',
+  'canplaythrough',
+  'canshowcurrentframe',
+  'dataunavailable',
+  'durationchange',
+  'emptied',
+  'empty',
+  'ended',
+  'error',
+  'loadeddata',
+  'loadedmetadata',
+  'loadstart',
+  'audioAvailable',
+  'MozAudioAvailable',
+  'WebkitAudioAvailable',
+  'pause',
+  'play',
+  'playing',
+  'progress',
+  'ratechange',
+  'seeked',
+  'seeking',
+  'suspend',
+  'timeupdate',
+  'volumechange',
+  'waiting'
+].forEach(function(eventType) {
+      video.addEventListener(eventType, function(event) {
+        console.log(event.type,
+            '\treadyState =', this.readyState,
+            '\tdimension =', this.videoWidth + 'x' + this.videoHeight,
+            '\tduration =', this.duration,
+            '\tcurrentTime ≈', this.currentTime.toFixed(3),
+            '\t@', Math.round(performance.now() - now));
+        now = performance.now();
+      });
+    });
+</script>
+</body>
+</html>
