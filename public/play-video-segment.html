@@ -1,0 +1,237 @@
+<!doctype html>
+<html>
+<head>
+<title>Play video segments</title>
+</head>
+<body>
+<h1>Play video segments</h1>
+
+<p>This experiment tries to playback a section of a video using Media Source API.</p>
+<ul>
+  <li>First, we load the header of the video file into the player.</li>
+  <li>Then, we load a segment located in the middle of the video.</li>
+  <li>When loaded, we set the video current time to that of the segment and start playback.</li>
+  <li>The next segments are then loaded in order.</li>
+</ul>
+
+<video controls style="border:1px solid grey;"></video>
+
+<p>This can be used to cache a part of a long video and playing it offline, without caching all of the video.</p>
+
+<p>It can also mimic the Media Fragment URI.</p>
+
+<p>Inspired by:</p>
+<ul>
+  <li>
+    <a href="http://d28nuaxr58rcpu.cloudfront.net/MediaSourceAPIDemo/demo.html">http://d28nuaxr58rcpu.cloudfront.net/MediaSourceAPIDemo/demo.html</a>
+  </li>
+  <li>
+    <a href="http://www.ioncannon.net/utilities/1515/segmenting-webm-video-and-the-mediasource-api/">http://www.ioncannon.net/utilities/1515/segmenting-webm-video-and-the-mediasource-api/</a>
+  </li>
+</ul>
+<script type="application/json" id="data">
+{
+  "total_size": 2348204,
+  "height": 270,
+  "width": 480,
+  "duration": 33003.0,
+  "clusters": [
+    {
+      "timecode": 0,
+      "offset": 4444
+    },
+    {
+      "timecode": 315,
+      "offset": 10989
+    },
+    {
+      "timecode": 4309,
+      "offset": 222621
+    },
+    {
+      "timecode": 7072,
+      "offset": 599142
+    },
+    {
+      "timecode": 9066,
+      "offset": 667276
+    },
+    {
+      "timecode": 11191,
+      "offset": 738542
+    },
+    {
+      "timecode": 13198,
+      "offset": 798966
+    },
+    {
+      "timecode": 13858,
+      "offset": 883382
+    },
+    {
+      "timecode": 14984,
+      "offset": 940730
+    },
+    {
+      "timecode": 15997,
+      "offset": 1041166
+    },
+    {
+      "timecode": 16599,
+      "offset": 1072717
+    },
+    {
+      "timecode": 18878,
+      "offset": 1143177
+    },
+    {
+      "timecode": 19825,
+      "offset": 1216541
+    },
+    {
+      "timecode": 20821,
+      "offset": 1390125
+    },
+    {
+      "timecode": 21793,
+      "offset": 1469691
+    },
+    {
+      "timecode": 22786,
+      "offset": 1671651
+    },
+    {
+      "timecode": 24899,
+      "offset": 1750149
+    },
+    {
+      "timecode": 25990,
+      "offset": 1916086
+    },
+    {
+      "timecode": 26664,
+      "offset": 1974909
+    },
+    {
+      "timecode": 29946,
+      "offset": 2170330
+    },
+    {
+      "timecode": 30155,
+      "offset": 2209983
+    },
+    {
+      "timecode": 30237,
+      "offset": 2225345
+    },
+    {
+      "timecode": 32181,
+      "offset": 2328964
+    },
+    {
+      "timecode": 32298,
+      "offset": 2336319
+    }
+  ]
+}
+</script>
+<script>
+var video = document.querySelector('video');
+var video_info = JSON.parse(document.getElementById('data').textContent);
+var mediaSource = null;
+var sourceBuffer = null;
+var current_cluster = 10; // The 10th cluster starts roughly at 17s.
+
+if (!'MediaSource' in window) {
+  console.warn('MediaSource is not available.');
+} else {
+  video_setup();
+}
+
+function video_setup() {
+  mediaSource = new MediaSource();
+  video.src = URL.createObjectURL(mediaSource);
+
+  mediaSource.addEventListener('sourceopen', function(event) {
+    console.log('MediaSource sourceopen event', event);
+
+    sourceBuffer = mediaSource.addSourceBuffer('video/webm;codecs=vp8,vorbis');
+
+    fetch_header(function() {
+      console.log('Header received');
+
+      fetch_next_cluster(function() {
+        console.log('1st cluster received');
+
+        video.play();
+      });
+    });
+  }, false);
+
+  mediaSource.addEventListener('sourceended', function(event) {
+    console.log('MediaSource sourceended event', event);
+  }, false);
+
+  video.addEventListener('progress', function(event) {
+    console.log('HTMLVideoElement progress event', event);
+
+    if (mediaSource.readyState !== 'ended') {
+      fetch_next_cluster();
+    }
+  }, false);
+
+  function seekFirstAvailableFrame(event) {
+    console.log('HTMLVideoElement first frame available');
+
+    // We adjust playback time to match the 1st available frame time.
+    // This is required by Chrome that starts playback at frame absolute time.
+    // Firefox plays as if the frame was the first one.
+    video.currentTime = 17.00;
+
+    // Then we remove the event listener.
+    video.removeEventListener('progress', seekFirstAvailableFrame, false);
+  }
+
+  video.addEventListener('progress', seekFirstAvailableFrame, false);
+}
+
+function fetch_header(callback) {
+  fetch_chunk(0, video_info.clusters[0].offset - 1, video_info.clusters.length === 1, callback);
+}
+
+function fetch_next_cluster(callback) {
+  if (video_info.clusters.length === current_cluster + 1) {
+    fetch_chunk(video_info.clusters[current_cluster].offset, video_info.total_size, true, callback);
+  } else {
+    fetch_chunk(video_info.clusters[current_cluster].offset, video_info.clusters[current_cluster + 1].offset - 1, false, callback);
+  }
+
+  current_cluster++;
+}
+
+function fetch_chunk(start_bytes, end_bytes, is_last, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'media/big-buck-bunny.webm', true);
+  xhr.setRequestHeader('Range', 'bytes=' + start_bytes + '-' + end_bytes);
+  xhr.responseType = 'arraybuffer';
+
+  xhr.onload = function(event) {
+    var status = event.target.status;
+    if (status === 200 || status === 206) {
+      sourceBuffer.appendBuffer(new Uint8Array(event.target.response));
+
+      if (is_last) {
+        mediaSource.endOfStream();
+      }
+
+      callback && callback();
+    } else {
+      console.error(event);
+    }
+  };
+
+  xhr.send();
+}
+</script>
+</body>
+</html>
