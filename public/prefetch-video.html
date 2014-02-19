@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<title>Prefetch video</title>
+</head>
+<body>
+<h1>Prefetch video</h1>
+
+<p>Prefetch a video and know exactly how much is loaded using XHR.</p>
+<video controls style="border:1px solid grey;"></video>
+<p>Taken from:</p>
+<ul>
+  <li>
+    <a href="http://blog.pearce.org.nz/2014/02/how-to-prefetch-videoaudio-files-for.html">http://blog.pearce.org.nz/2014/02/how-to-prefetch-videoaudio-files-for.html</a>
+  </li>
+</ul>
+<script>
+'use strict';
+
+var video = document.querySelector('video');
+prefetch_file('media/big-buck-bunny.webm',
+    function(url) {
+      video.src = url;
+      video.play();
+    },
+    function(pc) {
+      console.log(pc)
+    });
+
+function prefetch_file(url, fetched_callback, progress_callback) {
+  var prev_pc = 0;
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.responseType = 'blob';
+
+  xhr.addEventListener('load', function(event) {
+    var status = event.target.status;
+    if (status === 200) {
+      var URL = window.URL || window.webkitURL;
+      var blob_url = URL.createObjectURL(event.target.response);
+      fetched_callback(blob_url);
+    } else {
+      console.error(event);
+    }
+  }, false);
+
+  xhr.addEventListener('progress', function(event) {
+    if (event.lengthComputable) {
+      var pc = Math.round(event.loaded / event.total * 100);
+      if (pc !== prev_pc) {
+        prev_pc = pc;
+        progress_callback(pc);
+      }
+    }
+  }, false);
+
+  xhr.send();
+}
+</script>
+</body>
+</html>
