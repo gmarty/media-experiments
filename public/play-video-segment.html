@@ -136,6 +136,8 @@
 }
 </script>
 <script>
+'use strict';
+
 var video = document.querySelector('video');
 var video_info = JSON.parse(document.getElementById('data').textContent);
 var mediaSource = null;
@@ -172,8 +174,8 @@ function video_setup() {
     console.log('MediaSource sourceended event', event);
   }, false);
 
-  video.addEventListener('progress', function(event) {
-    console.log('HTMLVideoElement progress event', event);
+  video.addEventListener('timeupdate', function(event) {
+    console.log('HTMLVideoElement timeupdate event', event);
 
     if (mediaSource.readyState !== 'ended') {
       fetch_next_cluster();
