@@ -8,6 +8,8 @@
 <p>Open your browser console and look for the logged events.</p>
 <video src="media/big-buck-bunny.webm" autoplay controls></video>
 <script>
+'use strict';
+
 var video = document.querySelector('video');
 var now = performance.now();
 // From https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events
@@ -43,12 +45,12 @@ var now = performance.now();
       video.addEventListener(eventType, function(event) {
         console.log(event.type,
             '\treadyState =', this.readyState,
-            '\tdimension =', this.videoWidth + 'x' + this.videoHeight,
+            '\tdimension =', this.videoWidth + '×' + this.videoHeight,
             '\tduration =', this.duration,
             '\tcurrentTime ≈', this.currentTime.toFixed(3),
             '\t@', Math.round(performance.now() - now));
         now = performance.now();
-      });
+      }, false);
     });
 </script>
 </body>

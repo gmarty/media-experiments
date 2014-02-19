@@ -217,7 +217,7 @@ function fetch_chunk(start_bytes, end_bytes, is_last, callback) {
   xhr.setRequestHeader('Range', 'bytes=' + start_bytes + '-' + end_bytes);
   xhr.responseType = 'arraybuffer';
 
-  xhr.onload = function(event) {
+  xhr.addEventListener('load', function(event) {
     var status = event.target.status;
     if (status === 200 || status === 206) {
       sourceBuffer.appendBuffer(new Uint8Array(event.target.response));
@@ -230,7 +230,7 @@ function fetch_chunk(start_bytes, end_bytes, is_last, callback) {
     } else {
       console.error(event);
     }
-  };
+  }, false);
 
   xhr.send();
 }
